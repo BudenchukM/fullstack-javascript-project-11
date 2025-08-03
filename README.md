@@ -6,4 +6,4 @@
 [![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=BudenchukM_fullstack-javascript-project-11)
 
 Example webapp RSS agregator:
-https://fullstack-javascript-project-11-cv9057sru-budenchukms-projects.vercel.app/
+https://fullstack-javascript-project-11-beta.vercel.app/
