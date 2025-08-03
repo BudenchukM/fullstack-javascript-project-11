@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
+import initApp from './app.js';
 
 const render = () => {
   const app = document.getElementById('app');
@@ -13,10 +14,13 @@ const render = () => {
             <input 
               type="text" 
               id="url-input" 
+              name="url"
               class="form-control" 
               placeholder="RSS URL" 
               required
+              autofocus
             >
+            <div id="feedback" class="form-text"></div>
           </div>
           <div class="col-4">
             <button 
@@ -32,51 +36,7 @@ const render = () => {
     </div>
   `;
 
-  const form = document.getElementById('rss-form');
-  const input = document.getElementById('url-input');
-  const feedsContainer = document.getElementById('feeds');
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    const url = input.value.trim();
-    
-    // Валидация URL
-    if (!url) {
-      // Здесь можно добавить обработку ошибок
-      console.error('URL is required');
-      return;
-    }
-
-    // Создаем промис для обработки RSS
-    new Promise((resolve) => {
-      console.log('Adding RSS:', url);
-      // Здесь будет реальная логика загрузки RSS
-      // Пока просто имитируем успешную загрузку
-      setTimeout(() => resolve({ url, title: `Feed ${Date.now()}` }), 1000);
-    })
-    .then((feed) => {
-      // Добавляем новый фид в список
-      feedsContainer.insertAdjacentHTML(
-        'beforeend',
-        `<div class="col-md-4 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">${feed.title}</h5>
-              <p class="card-text">${feed.url}</p>
-            </div>
-          </div>
-        </div>`
-      );
-      input.value = '';
-    })
-    .catch((error) => {
-      console.error('Error adding RSS feed:', error);
-      // Здесь можно добавить отображение ошибки пользователю
-    });
-  };
-
-  form.addEventListener('submit', handleFormSubmit);
+  initApp();
 };
 
-// Инициализация приложения
 document.addEventListener('DOMContentLoaded', render);
