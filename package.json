@@ -28,10 +28,11 @@
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
     "cors": "^2.8.5",
-    "i18next": "^25.3.2",
+    "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "i18next-http-backend": "^3.0.2",
     "on-change": "^5.0.1",
+    "react-i18next": "^15.7.3",
     "yup": "^1.6.1"
   },
   "devDependencies": {
