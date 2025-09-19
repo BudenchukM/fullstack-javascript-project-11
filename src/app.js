@@ -1,11 +1,13 @@
 import createValidator from './validator.js';
 import createView from './view.js';
+import i18n from './i18n.js';
 
 const initApp = () => {
   const state = {
     form: {
       valid: true,
       error: '',
+      success: '',
     },
     feeds: [],
     urls: [],
@@ -25,6 +27,8 @@ const initApp = () => {
     return validator.validate({ url })
       .then(() => {
         watchedState.form.valid = true;
+        watchedState.form.error = '';
+        watchedState.form.success = i18n.t('success');
         return true;
       })
       .catch((err) => {
@@ -54,13 +58,14 @@ const initApp = () => {
         });
       })
       .then((feed) => {
+        if (!feed) return;
         watchedState.urls.push(feed.url);
         watchedState.feeds.push(feed);
         elements.input.value = '';
         elements.input.focus();
       })
-      .catch((error) => {
-        console.error('Error:', error);
+      .catch(() => {
+        watchedState.form.error = i18n.t('errors.network');
       });
   };
 

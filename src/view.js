@@ -1,44 +1,35 @@
 import onChange from 'on-change';
 
-const createView = (state, elements) => {
-  const watchedState = onChange(state, (path) => {
-    switch (path) {
-      case 'form.valid':
-        if (!state.form.valid) {
-          elements.input.classList.add('is-invalid');
-          elements.feedback.textContent = state.form.error;
-          elements.feedback.classList.remove('text-success');
-          elements.feedback.classList.add('text-danger');
-        } else {
-          elements.input.classList.remove('is-invalid');
-          elements.feedback.textContent = 'RSS added successfully';
-          elements.feedback.classList.remove('text-danger');
-          elements.feedback.classList.add('text-success');
-          setTimeout(() => {
-            elements.feedback.textContent = '';
-          }, 3000);
-        }
-        break;
-
-      case 'feeds':
-        elements.feedsContainer.innerHTML = state.feeds.map((feed) => `
-          <div class="col-md-4 mb-3">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">${feed.title}</h5>
-                <p class="card-text">${feed.url}</p>
-              </div>
-            </div>
-          </div>
-        `).join('');
-        break;
-
-      default:
-        break;
+export default (state, elements) => onChange(state, (path, value) => {
+  if (path === 'form.error') {
+    if (value) {
+      elements.input.classList.add('is-invalid');
+      elements.feedback.textContent = value;
+      elements.feedback.classList.remove('text-success');
+      elements.feedback.classList.add('text-danger');
+    } else {
+      elements.input.classList.remove('is-invalid');
+      elements.feedback.textContent = '';
     }
-  });
+  }
 
-  return watchedState;
-};
+  if (path === 'form.valid' && value === true) {
+    elements.input.classList.remove('is-invalid');
+    elements.feedback.textContent = '';
+  }
 
-export default createView;
+  if (path === 'form.success') {
+    elements.feedback.textContent = value;
+    elements.feedback.classList.remove('text-danger');
+    elements.feedback.classList.add('text-success');
+  }
+
+  if (path === 'feeds') {
+    elements.feedsContainer.innerHTML = '';
+    state.feeds.forEach((feed) => {
+      const div = document.createElement('div');
+      div.textContent = feed.title;
+      elements.feedsContainer.appendChild(div);
+    });
+  }
+});
