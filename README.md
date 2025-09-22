@@ -23,8 +23,11 @@ Node.js: 18.x или выше
 Настройка 
 
 1 - git clone https://github.com/BudenchukM/fullstack-javascript-project-11.git
+
 2 - cd fullstack-javascript-project-11
+
 3 - make install
+
 
 Далее есть 2 варианта:
 
