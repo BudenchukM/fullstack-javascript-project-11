@@ -1,5 +1,5 @@
 import axios from 'axios'
-import uniqueId from 'lodash/uniqueId';
+import uniqueId from 'lodash/uniqueId'
 import { string, setLocale } from 'yup'
 import parseRss from './parser.js'
 
