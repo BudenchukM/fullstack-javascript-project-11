@@ -1,42 +1,72 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap';
-import initApp from './app.js';
+import { loadFeed } from './api.js';
+import initView from './view.js';
 
-const render = () => {
-  const app = document.getElementById('app');
-  
-  app.innerHTML = `
-    <div class="container mt-5">
-      <h1 class="mb-4">RSS Aggregator</h1>
-      <form id="rss-form" class="mb-5">
-        <div class="row">
-          <div class="col-8">
-            <input 
-              type="text" 
-              id="url-input" 
-              name="url"
-              class="form-control" 
-              placeholder="RSS URL" 
-              required
-              autofocus
-            >
-            <div id="feedback" class="form-text"></div>
-          </div>
-          <div class="col-4">
-            <button 
-              type="submit" 
-              class="btn btn-primary w-100"
-            >
-              Add
-            </button>
-          </div>
-        </div>
-      </form>
-      <div id="feeds" class="row"></div>
-    </div>
-  `;
+const form = document.querySelector('#rss-form');
+const input = document.querySelector('#url-input');
+const feedback = document.querySelector('#feedback');
+const feedsContainer = document.querySelector('#feeds');
 
-  initApp();
+// добавим контейнер для постов (его нет в твоём index.html → добавь руками)
+let postsContainer = document.querySelector('#posts');
+if (!postsContainer) {
+  postsContainer = document.createElement('div');
+  postsContainer.id = 'posts';
+  postsContainer.className = 'row mt-4';
+  feedsContainer.insertAdjacentElement('afterend', postsContainer);
+}
+
+const state = {
+  feeds: [],
+  posts: [],
+  ui: {
+    error: null,
+  },
 };
 
-document.addEventListener('DOMContentLoaded', render);
+const elements = {
+  form,
+  input,
+  feedback,
+  feeds: feedsContainer,
+  posts: postsContainer,
+};
+
+const watchedState = initView(state, elements);
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const url = input.value.trim();
+  watchedState.ui.error = null;
+
+  loadFeed(url)
+    .then((result) => {
+      const feed = {
+        id: Date.now(),
+        url: result.url,
+        title: result.feed.title,
+        description: result.feed.description,
+      };
+      watchedState.feeds.push(feed);
+
+      const newPosts = result.posts.map((p) => ({
+        id: Date.now() + Math.random(),
+        feedId: feed.id,
+        title: p.title,
+        link: p.link,
+        description: p.description,
+      }));
+      watchedState.posts = watchedState.posts.concat(newPosts);
+
+      input.value = '';
+      input.focus();
+    })
+    .catch((err) => {
+      let message = 'Неизвестная ошибка';
+      if (err.message === 'invalidRss') {
+        message = 'Ресурс не содержит корректный RSS';
+      } else if (err.message === 'networkError') {
+        message = 'Ошибка сети';
+      }
+      watchedState.ui.error = message;
+    });
+});
