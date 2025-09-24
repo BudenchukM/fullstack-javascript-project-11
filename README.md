@@ -1,5 +1,6 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/BudenchukM/fullstack-javascript-project-11/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/BudenchukM/fullstack-javascript-project-11/actions)
+![Lint](https://github.com/BudenchukM/fullstack-javascript-project-11/actions/workflows/lint.yml/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=BudenchukM_fullstack-javascript-project-11&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=BudenchukM_fullstack-javascript-project-11)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=BudenchukM_fullstack-javascript-project-11&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=BudenchukM_fullstack-javascript-project-11)
 
