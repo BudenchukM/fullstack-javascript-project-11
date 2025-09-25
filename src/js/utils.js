@@ -3,9 +3,15 @@ import uniqueId from 'lodash/uniqueId'
 import { string, setLocale } from 'yup'
 import parseRss from './parser.js'
 
-// Константы для "магических чисел"
+// Константы
 const REQUEST_TIMEOUT_MS = 5000
 const UPDATE_INTERVAL_MS = 5000
+
+// Хелпер для обработки ошибок
+const handleError = (state, errorKey, error = null) => {
+  console.error(error)
+  Object.assign(state.loadingProcess, { status: 'failed', errorKey })
+}
 
 const createSchema = (rssLinks) => {
   return string().required().url().notOneOf(rssLinks)
@@ -77,26 +83,44 @@ const updatePosts = (rssLink, state) => {
         newPosts,
       })
     })
-    .catch(error => console.error(error))
+    .catch(error => {
+      handleError(state, 'networkError', error)
+    })
 }
 
 const addFeed = (rssLink, state) => {
+  Object.assign(state.loadingProcess, { status: 'loading', errorKey: null })
+
   return getRssData(rssLink, state)
     .then(({ newFeed, newPosts }) => {
       state.rssLinks.push(rssLink)
       state.feeds.push(newFeed)
+
       Object.assign(state.form, { status: 'valid', errorKey: null })
       Object.assign(state.loadingProcess, { status: 'success', errorKey: null })
+
       Object.assign(state.posts, {
         allPosts: state.posts.allPosts.concat(newPosts),
         newPosts,
       })
     })
+    .catch(error => {
+      handleError(state, 'networkError', error)
+    })
 }
 
 const runUpdatingPosts = (state) => {
   const promises = state.rssLinks.map(rssLink => updatePosts(rssLink, state))
+
   Promise.allSettled(promises)
+    .then(results => {
+      results.forEach((result, index) => {
+        if (result.status === 'rejected') {
+          handleError(state, 'networkError', result.reason)
+          console.error(`Ошибка обновления фида ${state.rssLinks[index]}:`, result.reason)
+        }
+      })
+    })
     .finally(() => setTimeout(() => runUpdatingPosts(state), UPDATE_INTERVAL_MS))
 }
 
