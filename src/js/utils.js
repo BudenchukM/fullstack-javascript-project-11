@@ -48,14 +48,12 @@ const getRssData = (rssLink, state) => {
         feedLink: rssLink,
       }
 
-      const posts = items.map((item) => {
-        return {
-          feedId,
-          postTitle: item.title,
-          postDescription: item.description,
-          postLink: item.link,
-        }
-      })
+      const posts = items.map((item) => ({
+        feedId,
+        postTitle: item.title,
+        postDescription: item.description,
+        postLink: item.link,
+      }))
 
       const newPosts = getNewPosts(posts, feedId, state)
       newPosts.forEach((post) => {
@@ -69,9 +67,7 @@ const getRssData = (rssLink, state) => {
 const updatePosts = (rssLink, state) => {
   return getRssData(rssLink, state)
     .then(({ newPosts }) => {
-      if (newPosts.length === 0) {
-        return
-      }
+      if (newPosts.length === 0) return
       Object.assign(state.posts, {
         allPosts: state.posts.allPosts.concat(newPosts),
         newPosts,
@@ -97,15 +93,14 @@ const addFeed = (rssLink, state) => {
 const runUpdatingPosts = (state) => {
   const promises = state.rssLinks.map(rssLink => updatePosts(rssLink, state))
   Promise.allSettled(promises)
-    .then(() => setTimeout(() => runUpdatingPosts(state), 5000))
+    .finally(() => setTimeout(() => runUpdatingPosts(state), 5000))
 }
 
 const handleCheckPost = (state, targetElementId) => {
   const { viewedPostsIds } = state.uiState
-  if (viewedPostsIds.includes(targetElementId)) {
-    return
+  if (!viewedPostsIds.includes(targetElementId)) {
+    viewedPostsIds.push(targetElementId)
   }
-  viewedPostsIds.push(targetElementId)
 }
 
 export {
