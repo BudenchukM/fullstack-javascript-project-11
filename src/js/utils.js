@@ -3,6 +3,10 @@ import uniqueId from 'lodash/uniqueId'
 import { string, setLocale } from 'yup'
 import parseRss from './parser.js'
 
+// Константы для "магических чисел"
+const REQUEST_TIMEOUT_MS = 5000
+const UPDATE_INTERVAL_MS = 5000
+
 const createSchema = (rssLinks) => {
   return string().required().url().notOneOf(rssLinks)
 }
@@ -33,7 +37,7 @@ const getNewPosts = (posts, feedId, state) => {
 
 const getRssData = (rssLink, state) => {
   const proxiedUrl = getProxiedUrl(rssLink)
-  return axios.get(proxiedUrl, { timeout: 5000 })
+  return axios.get(proxiedUrl, { timeout: REQUEST_TIMEOUT_MS })
     .then((response) => {
       const { contents } = response.data
       const { channel: feed, items } = parseRss(contents)
@@ -93,7 +97,7 @@ const addFeed = (rssLink, state) => {
 const runUpdatingPosts = (state) => {
   const promises = state.rssLinks.map(rssLink => updatePosts(rssLink, state))
   Promise.allSettled(promises)
-    .finally(() => setTimeout(() => runUpdatingPosts(state), 5000))
+    .finally(() => setTimeout(() => runUpdatingPosts(state), UPDATE_INTERVAL_MS))
 }
 
 const handleCheckPost = (state, targetElementId) => {
