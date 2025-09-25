@@ -48,7 +48,7 @@ const getRssData = (rssLink, state) => {
         feedLink: rssLink,
       }
 
-      const posts = items.map((item) => ({
+      const posts = items.map(item => ({
         feedId,
         postTitle: item.title,
         postDescription: item.description,
