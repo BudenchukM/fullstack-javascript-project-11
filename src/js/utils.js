@@ -3,7 +3,7 @@ import uniqueId from 'lodash/uniqueId'
 import { string, setLocale } from 'yup'
 import parseRss from './parser.js'
 
-// Константы для "магических чисел"
+// Константы
 const REQUEST_TIMEOUT_MS = 5000
 const UPDATE_INTERVAL_MS = 5000
 
@@ -32,7 +32,9 @@ const getProxiedUrl = (url) => {
 
 const getNewPosts = (posts, feedId, state) => {
   const currentFeedIdPosts = state.posts.allPosts.filter(post => post.feedId === feedId)
-  return posts.filter(newPost => !currentFeedIdPosts.some(oldPost => newPost.postLink === oldPost.postLink))
+  return posts.filter(
+    newPost => !currentFeedIdPosts.some(oldPost => newPost.postLink === oldPost.postLink),
+  )
 }
 
 const getRssData = (rssLink, state) => {
@@ -77,7 +79,9 @@ const updatePosts = (rssLink, state) => {
         newPosts,
       })
     })
-    .catch(error => console.error(error))
+    .catch((error) => {
+      console.error(`Ошибка при обновлении фида ${rssLink}:`, error)
+    })
 }
 
 const addFeed = (rssLink, state) => {
@@ -92,12 +96,18 @@ const addFeed = (rssLink, state) => {
         newPosts,
       })
     })
+    .catch((error) => {
+      console.error(`Ошибка при добавлении фида ${rssLink}:`, error)
+      Object.assign(state.loadingProcess, { status: 'failed', errorKey: 'formFeedback.errors.network' })
+    })
 }
 
 const runUpdatingPosts = (state) => {
   const promises = state.rssLinks.map(rssLink => updatePosts(rssLink, state))
   Promise.allSettled(promises)
-    .finally(() => setTimeout(() => runUpdatingPosts(state), UPDATE_INTERVAL_MS))
+    .finally(() => {
+      setTimeout(() => runUpdatingPosts(state), UPDATE_INTERVAL_MS)
+    })
 }
 
 const handleCheckPost = (state, targetElementId) => {
